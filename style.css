@@ -55,7 +55,13 @@
    2. RESET & BASE
 ================================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+
+html {
+  scroll-behavior: smooth;
+  /* FIX: Cegah horizontal scroll — animasi glossSweep memakai
+     translateX(240%) yang melampaui batas viewport */
+  overflow-x: hidden;
+}
 
 body {
   font-family: var(--font-body);
@@ -64,6 +70,8 @@ body {
   line-height: 1.65;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
+  /* FIX: Lapisan kedua keamanan overflow */
+  overflow-x: hidden;
 }
 
 img { display: block; max-width: 100%; }
@@ -75,26 +83,6 @@ a   { text-decoration: none; color: inherit; }
   16%  { opacity: 0.5; }
   45%  { opacity: 0.16; }
   100% { transform: translateX(240%) skewX(-18deg); opacity: 0; }
-}
-
-/* KELAS GLOBAL EFEK GLOSSY (BISA DITERAPKAN DI ELEMEN MANA SAJA) */
-.glossy-fx {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-.glossy-fx::after {
-  content: "";
-  position: absolute;
-  top: -120%; bottom: -120%;
-  width: 40%;
-  background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.65), rgba(255,255,255,0));
-  pointer-events: none;
-  transform: translateX(-140%) skewX(-18deg);
-  z-index: 10;
-}
-.glossy-fx:hover::after {
-  animation: glossSweep 0.95s ease;
 }
 
 
@@ -301,7 +289,7 @@ a   { text-decoration: none; color: inherit; }
   padding: 90px 0 70px;
   overflow: hidden;
   position: relative;
-  background-image: url('images/hero-bg.png');
+  background-image: url('assets/images/hero-bg.png');
   background-size: cover;
 }
 /* Speed-lines dekoratif di background kanan hero */
@@ -351,7 +339,7 @@ a   { text-decoration: none; color: inherit; }
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--red-dark);
+  color: var(--red);
   margin-bottom: 20px;
 }
 /* Dot merah berkedip di badge */
@@ -381,13 +369,13 @@ a   { text-decoration: none; color: inherit; }
 .hero__sub {
   font-size: 1rem;
   font-weight: 300;
-  color: var(--gray-light);
+  color: rgba(255,255,255,0.65);
   max-width: 420px;
   margin-bottom: 36px;
 }
 .hero__actions { display: flex; gap: 14px; flex-wrap: wrap; }
 
-/* ---- Dashboard Mockup (sisi kanan hero) ----     */
+/* ---- Dashboard Mockup (sisi kanan hero) ---- */
 .hero__visual { position: relative; }
 
 .dashboard-mockup {
@@ -512,6 +500,8 @@ a   { text-decoration: none; color: inherit; }
   color: var(--white);
   padding: 56px 0;
   text-align: center;
+  /* FIX: Cegah gloss sweep pill bocor ke luar section */
+  overflow: hidden;
 }
 .social-proof__label { margin-bottom: 8px; }
 .social-proof__title {
@@ -526,19 +516,22 @@ a   { text-decoration: none; color: inherit; }
   font-size: 0.9rem;
   color: rgba(255,255,255,0.4);
   max-width: 480px;
-  margin: 0 auto 16px;
+  margin: 0 auto 36px;
 }
 .social-proof__logos {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 24px;
+  align-items: stretch;   /* FIX: stretch agar semua pill sama tinggi */
+  gap: 16px;
   flex-wrap: wrap;
 }
-/* Pill logo media partner — bisa diganti dengan <img> logo asli */
+/* Pill logo media partner */
 .logo-pill {
+  /* FIX: Pakai width tetap agar semua pill sama lebar meski
+     gambar logo punya aspek rasio berbeda-beda */
+  width: 160px;
   height: 90px;
-  padding: 0 36px;
+  padding: 16px 20px;
   background: var(--white);
   border: 1px solid var(--gray-light);
   border-radius: var(--radius-lg);
@@ -555,6 +548,16 @@ a   { text-decoration: none; color: inherit; }
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+/* FIX: Gambar logo — object-fit contain supaya tidak crop/distorsi */
+.logo-pill img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
 .logo-pill::before {
   content: "";
@@ -563,7 +566,6 @@ a   { text-decoration: none; color: inherit; }
   background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0));
   pointer-events: none;
 }
-/* Efek kilap (gloss sweep) otomatis saat di-hover, seperti pada kartu gelap */
 .logo-pill::after {
   content: "";
   position: absolute;
@@ -573,8 +575,8 @@ a   { text-decoration: none; color: inherit; }
   pointer-events: none;
   transform: translateX(-140%) skewX(-18deg);
 }
-.logo-pill:hover { 
-  border-color: var(--red); 
+.logo-pill:hover {
+  border-color: var(--red);
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
@@ -586,7 +588,11 @@ a   { text-decoration: none; color: inherit; }
 /* ================================================================
    7. ④ FEATURE SECTIONS
 ================================================================ */
-.features { padding: 100px 0; }
+.features {
+  padding: 100px 0;
+  /* FIX: Cegah elemen geometri yang keluar batas bocor ke samping */
+  overflow: hidden;
+}
 .features__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1060,6 +1066,9 @@ a   { text-decoration: none; color: inherit; }
   .navbar__links, .navbar__cta { display: none; }
   .navbar__hamburger { display: flex; }
 
+  /* Buka batasan overflow agar navigasi bisa tampil keluar dari header */
+  .navbar.open { overflow: visible; }
+
   .navbar.open .navbar__links {
     display: flex;
     flex-direction: column;
@@ -1074,8 +1083,9 @@ a   { text-decoration: none; color: inherit; }
     display: flex;
     padding: 12px 24px 20px;
     position: absolute;
-    top: calc(62px + 140px);
+    top: calc(62px + 180px);
     left: 0; right: 0;
+    justify-content: flex-start;
     background: var(--off-black);
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
@@ -1093,15 +1103,26 @@ a   { text-decoration: none; color: inherit; }
   .cards-grid     { grid-template-columns: 1fr; }
   .footer__grid   { grid-template-columns: 1fr; gap: 40px; }
   .footer__nav    { flex-direction: column; gap: 32px; }
-  .social-proof__logos { gap: 14px; }
-  .logo-pill { 
-    height: 60px; 
-    padding: 0 20px; 
-    border-radius: var(--radius-md); 
+  .social-proof__logos {
+    /* FIX: Grid 2 kolom di mobile — lebih rapi dari flex-wrap
+       karena semua sel punya lebar yang sama persis */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 360px;
+    margin: 0 auto;
   }
-  .logo-pill img { 
-    height: 28px; 
+  .logo-pill {
+    /* FIX: Di mobile, pill mengisi lebar kolom grid, bukan fixed 160px */
+    width: 100%;
+    height: 72px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+  }
+  .logo-pill img {
+    max-height: 38px;
     width: auto;
+    height: auto;
   }
 }
 @media (max-width: 480px) {
